@@ -1,35 +1,36 @@
-from os import name
-import pandas as pd
+"""Automated Email Sending Script"""
+
+from os import name, getenv
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import pandas as pd
+import dotenv
+dotenv.load_dotenv()
 
+FROM_ADDR='ENTER_SENDERS_MAILID'
 
-from_addr='ENTER_SENDERS_MAILID'
+data=pd.read_csv("abc.csv")         # Enter path of CSV files containing EMAILs
+TO_ADDR=data['EMAIL'].tolist()      # Change'EMAIL' to column name containg EMAILids
+dataname = data['name'].tolist()
 
-data=pd.read_csv("abc.csv")         # Enter path of CSV files containing emails
-to_addr=data['email'].tolist()      # Change'email' to column name containg emailids
-name = data['name'].tolist()
+length=len(name)
 
-l=len(name)
-
-for i in range (l):
+for i in range (length):
     msg=MIMEMultipart()
-    msg['From']=from_addr
-    msg['To']=to_addr[i]
+    msg['From']=FROM_ADDR
+    msg['To']=TO_ADDR[i]
     msg['subject']='Just to Check'
-
-    body=name[i]+'Enter your content here' 
-
+    body=name[i]+'Enter your content here'
     msg.attach(MIMEText(body,'plain'))
 
-    email=""   #Enter Your email id here
-    password=""           #Enter your Password
+    EMAIL= getenv('EMAIL')
+    PASSWORD = getenv('PASSWORD')
 
     mail=smtplib.SMTP('smtp.gmail.com',587)
     mail.ehlo()
     mail.starttls()
-    mail.login(email,password)
+    mail.login(EMAIL,PASSWORD)
     text=msg.as_string()
-    mail.sendmail(from_addr,to_addr[i],text)
+    mail.sendmail(FROM_ADDR,TO_ADDR[i],text)
     mail.quit()
